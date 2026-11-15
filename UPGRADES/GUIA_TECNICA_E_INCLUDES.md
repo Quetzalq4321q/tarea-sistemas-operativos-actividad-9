@@ -75,6 +75,13 @@ Un sistema Productor-Consumidor real requiere un **búfer compartido de capacida
 - `cvNoVacio`: despierta a los consumidores cuando hay elementos disponibles.
 - Bandera `cerrado` + `notify_all()`: permite que los consumidores procesen los elementos restantes y finalicen limpiamente cuando todos los productores terminan, evitando bloqueos eternos.
 
+### 2.6 Por qué NO usar acortadores como `using namespace std;` (ni `#define` para constantes)
+En C++, escribir `using namespace std;` importa **todos** los símbolos de la biblioteca estándar al espacio de nombres global:
+- **Colisiones de nombres y ambigüedad:** identificadores muy comunes como `count`, `min`, `max`, `lock`, `move`, `distance`, `size`, `data` o `ref` existen en `std::`. Si tu código define una variable o función con alguno de esos nombres (por ejemplo `int count = 0;` o `void lock()`), el compilador puede producir errores ambiguos o elegir silenciosamente una sobrecarga no deseada mediante *ADL* (*Argument-Dependent Lookup*).
+- **Pérdida de claridad:** calificar explícitamente `std::mutex`, `std::thread`, `std::vector` o `std::cout` deja claro qué proviene de la biblioteca estándar y qué pertenece a tus propias clases.
+- **Riesgo en encabezados (`.h`/`.hpp`):** si alguna vez se extrae código a un archivo de cabecera, `using namespace std;` contamina a todos los archivos que lo incluyan.
+- **Macros `#define` vs `constexpr`:** los acortadores de preprocesador (`#define NUM_HILOS 10`) no respetan ámbitos ni verificación de tipos; en `UPGRADES/` se sustituyen por `constexpr`.
+
 ---
 
 ## 3. Explicación detallada archivo por archivo

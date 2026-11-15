@@ -51,6 +51,7 @@ El repositorio original está organizado como una secuencia didáctica progresiv
 5. **Validación inútil de desbordamiento (`LimitFideMax`)**: Comprobaba `fide > 2147483647` sobre un `int` de 32 bits, donde el desbordamiento ocurre antes durante `cin >> fide`.
 6. **Fugas de memoria y uso de `rand()`**: Múltiples `new` sin `delete` en `monitores/` y `productores02.cpp`, y llamadas a `rand()` (no garantizado como *thread-safe*) desde múltiples hilos.
 7. **`CMakeLists.txt` raíz original no enlazable**: Originalmente incluía los 17 archivos de `so-main/` dentro de un único `add_executable(...)`, lo cual generaba error de enlace por definición múltiple de `main`. Ya fue corregido en [CMakeLists.txt](../CMakeLists.txt) para que cada `.cpp` sea un ejecutable independiente.
+8. **Uso de `using namespace std;` y macros `#define` como acortadores**: `Completo_2 Filosofos_Exclusión.cpp`, `monitor00..04.cpp` y `productores01..02.cpp` usaban `using namespace std;` (contaminando el espacio de nombres global con riesgo de colisiones de símbolos como `std::count`, `std::min`, `std::lock` o `std::ref`), y varios archivos usaban `#define` para constantes en lugar de `constexpr`. Tanto los códigos de `UPGRADES/` como la rama `mejora/sin-using-namespace-std` califican explícitamente `std::` y evitan acortadores globales.
 
 ---
 

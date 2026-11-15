@@ -2,8 +2,6 @@
 #include<thread>
 #include<stdlib.h>
 
-using namespace std;
-
 // g++ productores02.cpp -lpthread
 
 #define NUM_PRODUCTORES 2
@@ -13,7 +11,7 @@ const char letras[26]={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','
 //void productor (int k);
 class Productor {
 	private:
-		thread t;
+		std::thread t;
 		int k;
 		void run_thread() {
 			int aleatorio;
@@ -25,7 +23,7 @@ class Productor {
 	public:
 		Productor(int id) {
 			k = id;
-			t = thread(&Productor::run_thread, this);
+			t = std::thread(&Productor::run_thread, this);
 			//t.join();
 		}
 		void join_thread(){

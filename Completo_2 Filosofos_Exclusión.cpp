@@ -1,27 +1,29 @@
-#include <iostream> // Librería estándar para entrada y salida de datos
-#include <thread> // Librería para trabajar con hilos de ejecución
-#include <mutex> // Librería para trabajar con mutex (exclusión mutua)
+#include <algorithm> // Para std::min
 #include <chrono> // Librería para trabajar con tiempo y duraciones
+#include <cstdlib> // Para std::exit
+#include <functional> // Para std::ref
+#include <iostream> // Librería estándar para entrada y salida de datos
+#include <mutex> // Librería para trabajar con mutex (exclusión mutua)
 #include <random> // Librería para generar números aleatorios
+#include <thread> // Librería para trabajar con hilos de ejecución
+#include <utility> // Para std::swap
 #include <vector> // Librería para trabajar con vectores
-
-using namespace std;
 
 // Función para limitar el número máximo de fideos
 int LimitFideMax(int fide) {
     const int maxFi = 2147483647;
     if (fide > maxFi) {
-        cout << "\n-------------------------------------------" << endl;
-        cout << "¡Se produjo un error!, el número de fideos excede la cantidad máxima" << endl;
-        exit(1);
+        std::cout << "\n-------------------------------------------" << std::endl;
+        std::cout << "¡Se produjo un error!, el número de fideos excede la cantidad máxima" << std::endl;
+        std::exit(1);
     }
-    return min(fide, maxFi);
+    return std::min(fide, maxFi);
 }
 
 // Clase que representa a un filósofo
 class Filo {
 public:
-    Filo(int id, int& fide, mutex& mutexFide) : id(id), fide(fide), mutexFide(mutexFide), estmag(0), timPensa(0) {}
+    Filo(int id, int& fide, std::mutex& mutexFide) : id(id), fide(fide), mutexFide(mutexFide), estmag(0), timPensa(0) {}
 
 // Sobrecarga del operador de llamada para utilizar el objeto como función
     void operator()() {
@@ -50,8 +52,8 @@ public:
     // El filósofo está pensando
     void pensa() {
         int timp = getTimAlea();
-        cout << "Filosofo N°" << id << " está pensando (" << timp << "s)" << endl;
-        this_thread::sleep_for(chrono::seconds(timp));
+        std::cout << "Filosofo N°" << id << " está pensando (" << timp << "s)" << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(timp));
         timPensa += timp;
     }
 
@@ -62,36 +64,36 @@ public:
 
         // Si el número del tenedor izquierdo es mayor al del derecho, se intercambian
         if (tenedorIzq > tenedorDer) {
-            swap(tenedorIzq, tenedorDer);
+            std::swap(tenedorIzq, tenedorDer);
         }
 
 	// Accedemos a los mutex de los tenedores
-        mutex& mutexTenedorIzq = tenedores[tenedorIzq];
-        mutex& mutexTenedorDer = tenedores[tenedorDer];
+        std::mutex& mutexTenedorIzq = tenedores[tenedorIzq];
+        std::mutex& mutexTenedorDer = tenedores[tenedorDer];
 
 	// Bloqueamos los mutex de los tenedores
-        unique_lock<mutex> lockIzq(mutexTenedorIzq, defer_lock);
-        unique_lock<mutex> lockDer(mutexTenedorDer, defer_lock);
+        std::unique_lock<std::mutex> lockIzq(mutexTenedorIzq, std::defer_lock);
+        std::unique_lock<std::mutex> lockDer(mutexTenedorDer, std::defer_lock);
 
-        lock(lockIzq, lockDer);
+        std::lock(lockIzq, lockDer);
 
-        cout << "Filosofo N°" << id << " ha tomado los tenedores " << tenedorIzq + 1 << " y " << tenedorDer + 1 << endl;
+        std::cout << "Filosofo N°" << id << " ha tomado los tenedores " << tenedorIzq + 1 << " y " << tenedorDer + 1 << std::endl;
     }
 
     // El filósofo está comiendo
     void come() {
-        lock_guard<mutex> lock(mutexFide);
+        std::lock_guard<std::mutex> lock(mutexFide);
 
 	// Si aún hay fideos disponibles
         if (fide > 0) {
             int porci = getTimAlea();
 
 	    // Limitamos la cantidad de fideos a la cantidad disponible
-            porci = min(porci, fide);
+            porci = std::min(porci, fide);
             fide -= porci;
             estmag += porci;
-            cout << "Filosofo N° " << id << " está comiendo (" << porci << ")" << endl;
-            cout << "Filosofo N° " << id << " incrementó el valor del estómago (" << estmag - porci << " + " << porci << " = " << estmag << ")" << endl;
+            std::cout << "Filosofo N° " << id << " está comiendo (" << porci << ")" << std::endl;
+            std::cout << "Filosofo N° " << id << " incrementó el valor del estómago (" << estmag - porci << " + " << porci << " = " << estmag << ")" << std::endl;
         }
     }
 
@@ -102,64 +104,64 @@ public:
 
 	// Si el número del tenedor izquierdo es mayor al del derecho, se intercambian
         if (tenedorIzq > tenedorDer) {
-            swap(tenedorIzq, tenedorDer);
+            std::swap(tenedorIzq, tenedorDer);
         }
 
 	// Accedemos a los mutex de los tenedores
-        mutex& mutexTenedorIzq = tenedores[tenedorIzq];
-        mutex& mutexTenedorDer = tenedores[tenedorDer];
+        std::mutex& mutexTenedorIzq = tenedores[tenedorIzq];
+        std::mutex& mutexTenedorDer = tenedores[tenedorDer];
 
 	// Desbloqueamos los mutex de los tenedores
         mutexTenedorIzq.unlock();
         mutexTenedorDer.unlock();
 
-        cout << "Filosofo N°" << id << " ha dejado los tenedores " << tenedorIzq + 1 << " y " << tenedorDer + 1 << endl;
+        std::cout << "Filosofo N°" << id << " ha dejado los tenedores " << tenedorIzq + 1 << " y " << tenedorDer + 1 << std::endl;
     }
 
     // Método para generar un tiempo aleatorio de pensamiento
     int getTimAlea() const {
-        random_device rd;
-        mt19937 gen(rd());
-        uniform_int_distribution<int> dist(1, 5);
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> dist(1, 5);
         return dist(gen);
     }
 
     int id;
     int& fide;
-    mutex& mutexFide;
+    std::mutex& mutexFide;
     int estmag;
     int timPensa;
-    static vector<mutex> tenedores;
+    static std::vector<std::mutex> tenedores;
 };
 
-vector<mutex> Filo::tenedores(5);
+std::vector<std::mutex> Filo::tenedores(5);
 
 int main() {
     int fide;
     int numFilos;
 
-    cout << "\n--------SIMULADOR DE FILOSOFOS COMENSALES--------" << endl;
-    cout << "\nBienvenido Usuario, Escriba los datos pedidos:" << endl;
-    cout << "\n(Recuerda que el máximo de fideos es 2,147,483,647)" << endl;
-    cout << "\n- Cuantos Fideos Pondras: ";
-    cin >> fide;
+    std::cout << "\n--------SIMULADOR DE FILOSOFOS COMENSALES--------" << std::endl;
+    std::cout << "\nBienvenido Usuario, Escriba los datos pedidos:" << std::endl;
+    std::cout << "\n(Recuerda que el máximo de fideos es 2,147,483,647)" << std::endl;
+    std::cout << "\n- Cuantos Fideos Pondras: ";
+    std::cin >> fide;
     fide = LimitFideMax(fide);
-    cout << "\n- Escriba la cantidad de filósofos que habrá: ";
-    cin >> numFilos;
-    cout << "\n-------------------------------------------" << endl;
-    cout << "\nEjecutando procedimiento......." << endl;
-    cout << "\n-------------------------------------------" << endl;
+    std::cout << "\n- Escriba la cantidad de filósofos que habrá: ";
+    std::cin >> numFilos;
+    std::cout << "\n-------------------------------------------" << std::endl;
+    std::cout << "\nEjecutando procedimiento......." << std::endl;
+    std::cout << "\n-------------------------------------------" << std::endl;
 
-    mutex mutexFide;
+    std::mutex mutexFide;
 
-    vector<Filo> filos;
+    std::vector<Filo> filos;
     filos.reserve(numFilos);
-    vector<thread> hilos;
+    std::vector<std::thread> hilos;
 
     // Creación de los filósofos y los hilos de ejecución
     for (int i = 0; i < numFilos; ++i) {
         filos.emplace_back(i + 1, fide, mutexFide);
-        hilos.emplace_back(ref(filos[i]));
+        hilos.emplace_back(std::ref(filos[i]));
     }
 
     // Espera a que todos los hilos terminen su ejecución
@@ -167,25 +169,25 @@ int main() {
         hilos[i].join();
     }
 
-    cout << "\n-------------------------------------------" << endl;
-    cout << "\n....La ejecución del programa ha terminado...." << endl;
-    cout << "\nMostrando datos finales........" << endl;
-    cout << "\n---------------Estadísticas:----------------\n" << endl;
+    std::cout << "\n-------------------------------------------" << std::endl;
+    std::cout << "\n....La ejecución del programa ha terminado...." << std::endl;
+    std::cout << "\nMostrando datos finales........" << std::endl;
+    std::cout << "\n---------------Estadísticas:----------------\n" << std::endl;
     int totalEstmag = 0;
     int totalTimPensa = 0;
     for (int i = 0; i < numFilos; ++i) {
-        cout << "+ Filosofos N°(" << filos[i].id << ") :" << endl;
-        cout << "\t* Tiempo pensando: " << filos[i].getTimPensa() << "s" << endl;
-        cout << "\t* Estómago: " << filos[i].getEstmag() << endl;
+        std::cout << "+ Filosofos N°(" << filos[i].id << ") :" << std::endl;
+        std::cout << "\t* Tiempo pensando: " << filos[i].getTimPensa() << "s" << std::endl;
+        std::cout << "\t* Estómago: " << filos[i].getEstmag() << std::endl;
         totalEstmag += filos[i].getEstmag();
         totalTimPensa += filos[i].getTimPensa();
-        cout << endl;
+        std::cout << std::endl;
     }
-    cout << "\n---------------Datos finales---------------\n" << endl;
-    cout << "1.- Total de comida consumida por los filósofos: " << totalEstmag << endl;
-    cout << "2.- Fideos que restan: " << fide << endl;
-    cout << "3.- Total de tiempo pensando: " << totalTimPensa << "s" << endl;
-    cout << "\n-------------------------------------------" << endl;
-    cout << "\t\t\n-----FIN DE LA EJECUCIÓN------" << endl;
+    std::cout << "\n---------------Datos finales---------------\n" << std::endl;
+    std::cout << "1.- Total de comida consumida por los filósofos: " << totalEstmag << std::endl;
+    std::cout << "2.- Fideos que restan: " << fide << std::endl;
+    std::cout << "3.- Total de tiempo pensando: " << totalTimPensa << "s" << std::endl;
+    std::cout << "\n-------------------------------------------" << std::endl;
+    std::cout << "\t\t\n-----FIN DE LA EJECUCIÓN------" << std::endl;
     return 0;
 }

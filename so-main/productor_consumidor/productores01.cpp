@@ -2,8 +2,6 @@
 #include<thread>
 #include<stdlib.h>
 
-using namespace std;
-
 // g++ productores01.cpp -lpthread
 
 #define NUM_PRODUCTORES 2
@@ -14,14 +12,14 @@ void productor (int k);
 
 int main(void)
 {
-	thread productores[NUM_PRODUCTORES];
+	std::thread productores[NUM_PRODUCTORES];
 	int identificadores[NUM_PRODUCTORES];
 
 	int i;
 
 	for (i=0; i<NUM_PRODUCTORES; i++)	{
 		
-		productores[i] = thread(productor, i);
+		productores[i] = std::thread(productor, i);
 	}
 
 

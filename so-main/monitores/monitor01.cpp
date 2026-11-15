@@ -1,8 +1,6 @@
 #include<iostream>
 #include<thread>
 
-using namespace std;
-
 // g++ monitor01.cpp -lpthread
 
 #define NUM_HILOS 10
@@ -22,16 +20,16 @@ class Monitor {
 class Hilo {
 	private:
 		Monitor* monitor;
-		thread t;
+		std::thread t;
 		void run_thread(){
 			monitor->inc();		//	RUN
-			cout<<cont<<endl;	//	RUN
+			std::cout<<cont<<std::endl;	//	RUN
 		}
 			
 	public:
 		Hilo(){
 			monitor = new Monitor;
-			t = thread(&Hilo::run_thread, this);
+			t = std::thread(&Hilo::run_thread, this);
 		}
 		void join_thread(){
 			t.join();	// START

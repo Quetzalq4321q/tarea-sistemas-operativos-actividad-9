@@ -1,7 +1,5 @@
 #include<iostream>
 
-using namespace std;
-
 // g++ monitor00.cpp
 
 #define NUM_HILOS 10
@@ -28,7 +26,7 @@ class Hilo {
 		}
 		void run(){
 			monitor->inc();
-			cout<<cont<<endl;
+			std::cout<<cont<<std::endl;
 		}
 };
 

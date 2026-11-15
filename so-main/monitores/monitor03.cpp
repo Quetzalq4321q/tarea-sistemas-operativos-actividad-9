@@ -2,14 +2,12 @@
 #include<thread>
 #include<mutex>
 
-using namespace std;
-
 // g++ monitor03.cpp -lpthread
 
 #define NUM_HILOS 10
 
 int cont=0;
-mutex flag;
+std::mutex flag;
 
 class Monitor {
 	public:
@@ -26,18 +24,18 @@ class Monitor {
 class Hilo {
 	private:
 		Monitor* monitor;
-		thread t;
+		std::thread t;
 		void run_thread(){
 			flag.lock();	// LOCK	----ERROR
 			monitor->inc();		//	RUN
-			cout<<cont<<endl;	//	RUN
+			std::cout<<cont<<std::endl;	//	RUN
 			flag.unlock();	// UNLOCK	----ERROR
 		}
 			
 	public:
 		Hilo(){
 			monitor = new Monitor;
-			t = thread(&Hilo::run_thread, this);
+			t = std::thread(&Hilo::run_thread, this);
 		}
 		void join_thread(){
 			t.join();	// START
