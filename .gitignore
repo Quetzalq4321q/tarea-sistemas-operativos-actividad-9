@@ -1,0 +1,15 @@
+# Directorios de compilación e IDE
+cmake-build-debug/
+cmake-build-*/
+UPGRADES/build/
+build/
+.idea/
+
+# Binarios y objetos compilados
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.lib
+*.pdb

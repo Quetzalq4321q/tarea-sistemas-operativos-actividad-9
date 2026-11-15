@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.16)
+project(so_upgrades LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(Threads REQUIRED)
+
+function(add_upgraded_target target_name source_file)
+    add_executable(${target_name} ${source_file})
+    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+    if (MSVC)
+        target_compile_options(${target_name} PRIVATE /W4)
+    else()
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+endfunction()
+
+add_upgraded_target(pthread_example_upgraded pthread/pthread_example_upgraded.cpp)
+add_upgraded_target(exclusion_mutua_posix_upgraded exclusion_mutua/exclusion_mutua_posix_upgraded.cpp)
+add_upgraded_target(exclusion_mutua_cpp_upgraded exclusion_mutua/exclusion_mutua_cpp_upgraded.cpp)
+add_upgraded_target(filosofos_basico_upgraded filosofos_comensales/filosofos_basico_upgraded.cpp)
+add_upgraded_target(monitor_upgraded monitores/monitor_upgraded.cpp)
+add_upgraded_target(productor_consumidor_upgraded productor_consumidor/productor_consumidor_upgraded.cpp)
+add_upgraded_target(completo_1_upgraded Completo_1_Filosofos_Exclusion_upgraded.cpp)
+add_upgraded_target(completo_2_upgraded Completo_2_Filosofos_Exclusion_upgraded.cpp)
