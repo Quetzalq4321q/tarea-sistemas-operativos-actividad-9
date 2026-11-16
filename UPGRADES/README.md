@@ -1,6 +1,6 @@
 # UPGRADES — Análisis y Versiones Mejoradas (`so-main-20240614T154818Z-001`)
 
-Este directorio contiene la documentación completa y las versiones corregidas/modernizadas (C++17 y POSIX seguro) de todos los programas del repositorio de **Sistemas Operativos: Concurrencia y Sincronización**.
+Este directorio contiene la documentación completa y las versiones corregidas/modernizadas (C++17 y POSIX seguro) de todos los programas del repositorio de **Sistemas Operativos — Concurrencia y Sincronización**.
 
 > Para el desglose línea por línea de cada archivo original, el propósito de todos los `#include` y los conceptos teóricos clave, consulta **[GUIA_TECNICA_E_INCLUDES.md](./GUIA_TECNICA_E_INCLUDES.md)**.
 
@@ -8,21 +8,21 @@ Este directorio contiene la documentación completa y las versiones corregidas/m
 
 ## 1. Funcionamiento general del proyecto original
 
-El repositorio original está organizado como una secuencia didáctica progresiva para enseñar programación concurrente en C y C++:
+El repositorio original está organizado como una secuencia didáctica progresiva para enseñar programación concurrente en C y C++.
 
-1. **Hilos básicos con POSIX (`so-main/pthread/pthread-example.cpp`)**:
+1. **Hilos básicos con POSIX (`so-main/pthread/pthread-example.cpp`)**
    Introducción a la creación (`pthread_create`) y sincronización de finalización (`pthread_join`) de múltiples hilos en C/POSIX.
-2. **Filósofos comensales básicos (`so-main/filosofos_comensales/filosofos00.cpp` – `04.cpp`)**:
+2. **Filósofos comensales básicos (`so-main/filosofos_comensales/filosofos00.cpp` – `04.cpp`)**
    Evolución incremental desde un `"Hola mundo!"` (`00`), llamadas secuenciales finitas (`01`), bucles infinitos secuenciales (`02`), dos hilos nombrados con `pthread` (`03`), hasta 5 hilos indexados (`04`) sin sincronización ni tenedores todavía.
-3. **Exclusión mutua (`so-main/exclusion_mutua/exclusionMutua00.cpp` – `02.cpp`)**:
+3. **Exclusión mutua (`so-main/exclusion_mutua/exclusionMutua00.cpp` – `02.cpp`)**
    Demuestra primero una **condición de carrera** (*race condition*) sobre un contador global `variable` (`00` y `01`), y luego la soluciona protegiendo la sección crítica con `pthread_mutex_t` (`02`).
-4. **Monitores (`so-main/monitores/monitor00.cpp` – `04.cpp`)**:
-   Intenta encapsular el acceso concurrente a `cont` en una clase `Monitor` usando `std::thread` y `std::mutex`. Va mostrando errores típicos de diseño: ejecución secuencial (`00`), hilos sin mutex (`01`), mutex dentro de `Monitor` con instancia duplicada por hilo (`02`), bloqueo puesto fuera del monitor en `Hilo` (`03`), y un intento de compartir un único `Monitor*` (`04`) que deja el puntero sin inicializar.
-5. **Productor-Consumidor (`so-main/productor_consumidor/productores00.cpp` – `02.cpp`)**:
+4. **Monitores (`so-main/monitores/monitor00.cpp` – `04.cpp`)**
+   Intenta encapsular el acceso concurrente a `cont` en una clase `Monitor` usando `std::thread` y `std::mutex`. Va mostrando errores típicos de diseño — ejecución secuencial (`00`), hilos sin mutex (`01`), mutex dentro de `Monitor` con instancia duplicada por hilo (`02`), bloqueo puesto fuera del monitor en `Hilo` (`03`), y un intento de compartir un único `Monitor*` (`04`) que deja el puntero sin inicializar.
+5. **Productor-Consumidor (`so-main/productor_consumidor/productores00.cpp` – `02.cpp`)**
    Muestra la migración sintáctica de `pthread` (`00`) a `std::thread` funcional (`01`) y a `std::thread` encapsulado en clase (`02`), aunque solo implementa productores en bucle infinito sin búfer ni consumidores.
-6. **Simuladores integradores en la raíz**:
-   - `Completo_1 Filosofos_Exclusion.cpp`: Múltiples filósofos (`std::thread`) comparten un plato de `256` fideos protegido por `std::mutex` y calculan estadísticas de estómago y tiempos.
-   - `Completo_2 Filosofos_Exclusión.cpp`: Añade la simulación de **tenedores compartidos** en la mesa circular además del mutex del plato de fideos.
+6. **Simuladores integradores en la raíz**
+   - `Completo_1 Filosofos_Exclusion.cpp` — Múltiples filósofos (`std::thread`) comparten un plato de `256` fideos protegido por `std::mutex` y calculan estadísticas de estómago y tiempos.
+   - `Completo_2 Filosofos_Exclusión.cpp` — Añade la simulación de **tenedores compartidos** en la mesa circular además del mutex del plato de fideos.
 
 ---
 
@@ -44,23 +44,23 @@ El repositorio original está organizado como una secuencia didáctica progresiv
 
 ## 3. Problemas críticos detectados en el código original
 
-1. **Puntero sin inicializar en `monitor04.cpp`**: `Monitor* mo;` se pasa a `new Hilo(mo)` sin haber creado un `new Monitor()`, causando comportamiento indefinido (*Undefined Behavior* / fallo de segmentación).
-2. **Error grave de ciclo de vida de `unique_lock` en `Completo_2 Filosofos_Exclusión.cpp`**: `tomarTenedores()` bloqueaba `lockIzq` y `lockDer` como variables locales que se destruían (y desbloqueaban) al retornar el método; luego `dejarTenedores()` llamaba manualmente a `.unlock()` sobre mutex ya desbloqueados.
-3. **Desbordamiento de arreglo en `Completo_2 Filosofos_Exclusión.cpp`**: `tenedores` tenía tamaño fijo `5` (`id % 5`), pero el usuario podía ingresar cualquier `numFilos`, provocando accesos fuera de límites si `numFilos > 5`.
-4. **Condiciones de carrera en lecturas de `fideos` / `fide` y `std::cout`**: Tanto `Completo_1` como `Completo_2` leían la variable compartida en la condición del bucle sin mutex y escribían en `std::cout` concurrentemente.
-5. **Validación inútil de desbordamiento (`LimitFideMax`)**: Comprobaba `fide > 2147483647` sobre un `int` de 32 bits, donde el desbordamiento ocurre antes durante `cin >> fide`.
-6. **Fugas de memoria y uso de `rand()`**: Múltiples `new` sin `delete` en `monitores/` y `productores02.cpp`, y llamadas a `rand()` (no garantizado como *thread-safe*) desde múltiples hilos.
-7. **`CMakeLists.txt` raíz original no enlazable**: Originalmente incluía los 17 archivos de `so-main/` dentro de un único `add_executable(...)`, lo cual generaba error de enlace por definición múltiple de `main`. Ya fue corregido en [CMakeLists.txt](../CMakeLists.txt) para que cada `.cpp` sea un ejecutable independiente.
-8. **Uso de `using namespace std;` y macros `#define` como acortadores**: `Completo_2 Filosofos_Exclusión.cpp`, `monitor00..04.cpp` y `productores01..02.cpp` usaban `using namespace std;` (contaminando el espacio de nombres global con riesgo de colisiones de símbolos como `std::count`, `std::min`, `std::lock` o `std::ref`), y varios archivos usaban `#define` para constantes en lugar de `constexpr`. Tanto los códigos de `UPGRADES/` como la rama `mejora/sin-using-namespace-std` califican explícitamente `std::` y evitan acortadores globales.
-9. **Problemas de codificación UTF-8 en consola de Windows**: La consola clásica de Windows (`cmd.exe` / consola de ejecución de CLion) usa por defecto páginas de códigos OEM/ANSI (como CP850 o CP1252), lo que provoca que tildes, `ñ`, `°` o `¡` escritos en UTF-8 se impriman como caracteres corruptos (`Fil├│sofo`, `est├í`, `N┬░`). Se corrigió configurando `-finput-charset=UTF-8 -fexec-charset=UTF-8` (GCC) / `/utf-8` (MSVC) en CMake y llamando a `SetConsoleOutputCP(CP_UTF8)` y `SetConsoleCP(CP_UTF8)` en `#ifdef _WIN32`.
+1. **Puntero sin inicializar en `monitor04.cpp`** — `Monitor* mo;` se pasa a `new Hilo(mo)` sin haber creado un `new Monitor()`, causando comportamiento indefinido (*Undefined Behavior* / fallo de segmentación).
+2. **Error grave de ciclo de vida de `unique_lock` en `Completo_2 Filosofos_Exclusión.cpp`** — `tomarTenedores()` bloqueaba `lockIzq` y `lockDer` como variables locales que se destruían (y desbloqueaban) al retornar el método; luego `dejarTenedores()` llamaba manualmente a `.unlock()` sobre mutex ya desbloqueados.
+3. **Desbordamiento de arreglo en `Completo_2 Filosofos_Exclusión.cpp`** — `tenedores` tenía tamaño fijo `5` (`id % 5`), pero el usuario podía ingresar cualquier `numFilos`, provocando accesos fuera de límites si `numFilos > 5`.
+4. **Condiciones de carrera en lecturas de `fideos` / `fide` y `std::cout`** — Tanto `Completo_1` como `Completo_2` leían la variable compartida en la condición del bucle sin mutex y escribían en `std::cout` concurrentemente.
+5. **Validación inútil de desbordamiento (`LimitFideMax`)** — Comprobaba `fide > 2147483647` sobre un `int` de 32 bits, donde el desbordamiento ocurre antes durante `cin >> fide`.
+6. **Fugas de memoria y uso de `rand()`** — Múltiples `new` sin `delete` en `monitores/` y `productores02.cpp`, y llamadas a `rand()` (no garantizado como *thread-safe*) desde múltiples hilos.
+7. **`CMakeLists.txt` raíz original no enlazable** — Originalmente incluía los 17 archivos de `so-main/` dentro de un único `add_executable(...)`, lo cual generaba error de enlace por definición múltiple de `main`. Ya fue corregido en [CMakeLists.txt](../CMakeLists.txt) para que cada `.cpp` sea un ejecutable independiente.
+8. **Uso de `using namespace std;` y macros `#define` como acortadores** — `Completo_2 Filosofos_Exclusión.cpp`, `monitor00..04.cpp` y `productores01..02.cpp` usaban `using namespace std;` (contaminando el espacio de nombres global con riesgo de colisiones de símbolos como `std::count`, `std::min`, `std::lock` o `std::ref`), y varios archivos usaban `#define` para constantes en lugar de `constexpr`. Tanto los códigos de `UPGRADES/` como la rama `mejora/sin-using-namespace-std` califican explícitamente `std::` y evitan acortadores globales.
+9. **Problemas de codificación UTF-8 en consola de Windows** — La consola clásica de Windows (`cmd.exe` / consola de ejecución de CLion) usa por defecto páginas de códigos OEM/ANSI (como CP850 o CP1252), lo que provoca que tildes, `ñ`, `°` o `¡` escritos en UTF-8 se impriman como caracteres corruptos (`Fil├│sofo`, `est├í`, `N┬░`). Se corrigió configurando `-finput-charset=UTF-8 -fexec-charset=UTF-8` (GCC) / `/utf-8` (MSVC) en CMake y llamando a `SetConsoleOutputCP(CP_UTF8)` y `SetConsoleCP(CP_UTF8)` en `#ifdef _WIN32`.
 
 ---
 
 ## 4. Cómo compilar y ejecutar los programas de `UPGRADES/`
 
-### Opción A: Con CMake y Ninja (herramientas incluidas en CLion)
+### Opción A — Con CMake y Ninja (herramientas incluidas en CLion)
 
-Desde la carpeta raíz `C:\Users\User\Downloads\so-main-20240614T154818Z-001`:
+Desde la carpeta raíz `C:\Users\User\Downloads\so-main-20240614T154818Z-001`
 
 ```powershell
 $cmake = "C:\Users\User\AppData\Local\Programs\CLion\bin\cmake\win\x64\bin\cmake.exe"
@@ -71,7 +71,7 @@ $cxx   = "C:\Users\User\AppData\Local\Programs\CLion\bin\mingw\bin\g++.exe"
 & $cmake --build UPGRADES/build
 ```
 
-Para ejecutar cualquiera de los binarios compilados desde PowerShell (asegurando las DLLs de MinGW en el `PATH`):
+Para ejecutar cualquiera de los binarios compilados desde PowerShell (asegurando las DLLs de MinGW en el `PATH`)
 
 ```powershell
 $env:PATH = "C:\Users\User\AppData\Local\Programs\CLion\bin\mingw\bin;" + $env:PATH
@@ -85,7 +85,7 @@ $env:PATH = "C:\Users\User\AppData\Local\Programs\CLion\bin\mingw\bin;" + $env:P
 .\UPGRADES\build\completo_2_upgraded.exe
 ```
 
-### Opción B: Compilación individual con `g++`
+### Opción B — Compilación individual con `g++`
 
 ```powershell
 $gpp = "C:\Users\User\AppData\Local\Programs\CLion\bin\mingw\bin\g++.exe"
