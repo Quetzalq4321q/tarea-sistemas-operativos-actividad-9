@@ -9,6 +9,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de:
  *   so-main/productor_consumidor/productores00.cpp .. productores02.cpp
@@ -126,6 +136,10 @@ void tareaConsumidor(int id,
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     BufferAcotado<char> buffer(CAPACIDAD_BUFFER);
     std::atomic<int> totalProducido{0};
     std::atomic<int> totalConsumido{0};

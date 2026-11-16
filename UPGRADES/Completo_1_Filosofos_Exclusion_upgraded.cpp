@@ -11,6 +11,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de: Completo_1 Filosofos_Exclusion.cpp
  *
@@ -135,6 +145,10 @@ int leerEnteroPositivo(const std::string& prompt, int minimo, int maximo) {
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     PlatoCompartido plato;
     std::cout << "Fideos iniciales = " << plato.fideos << '\n';
 

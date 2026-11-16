@@ -5,6 +5,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de:
  *   so-main/monitores/monitor00.cpp .. monitor04.cpp
@@ -89,6 +99,10 @@ public:
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     auto monitorCompartido = std::make_shared<MonitorContador>();
     const int metaEsperada = NUM_HILOS * INCREMENTOS_POR_HILO;
 

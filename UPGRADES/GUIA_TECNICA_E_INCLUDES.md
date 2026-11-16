@@ -39,6 +39,7 @@ Este documento complementa a [README.md](./README.md) explicando:
 | `<queue>` | Cola FIFO `std::queue<T>` utilizada como estructura del búfer acotado en `productor_consumidor_upgraded.cpp`. |
 | `<memory>` | Punteros inteligentes RAII (`std::shared_ptr`, `std::unique_ptr`) que garantizan liberación automática de memoria y evitan las fugas de `new` sin `delete` presentes en `monitores/` y `productores02.cpp`. |
 | `<algorithm>` | Funciones utilitarias como `std::min` para limitar la porción de fideos tomada al saldo disponible. |
+| `<windows.h>` *(condicional `#ifdef _WIN32`)* | Permite invocar `SetConsoleOutputCP(CP_UTF8)` y `SetConsoleCP(CP_UTF8)` al inicio de `main()` para que la consola de Windows interprete correctamente los caracteres UTF-8 (`á, é, í, ó, ú, ñ, °, ¡`). Se acompaña de `WIN32_LEAN_AND_MEAN` y `NOMINMAX` para evitar colisiones de macros como `min`/`max`. |
 
 ---
 

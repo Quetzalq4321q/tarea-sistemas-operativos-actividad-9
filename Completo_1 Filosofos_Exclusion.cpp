@@ -5,6 +5,16 @@
 #include <random>       // Librería para generar números aleatorios
 #include <mutex>        // Librería para proporcionar mecanismos de sincronización
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 unsigned int fideos = 256;      // Cantidad inicial de fideos en el plato
 std::mutex mutex;               // Objeto mutex para sincronizar el acceso a la variable fideos
 
@@ -66,6 +76,10 @@ public:
 };
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     int numFilosofos;
     std::cout << "Fideos = " << fideos << std::endl;                            // Imprime la cantidad inicial de fideos en el plato
     std::cout << "Ingrese cantidad de filósofos: ";

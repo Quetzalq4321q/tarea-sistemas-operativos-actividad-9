@@ -11,6 +11,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de: Completo_2 Filosofos_Exclusión.cpp
  *
@@ -191,6 +201,10 @@ int leerCantidadFilosofos() {
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     std::cout << "\n-------- SIMULADOR DE FILÓSOFOS COMENSALES (UPGRADE) --------\n\n";
     int fide = leerFideosValidos();
     const int numFilos = leerCantidadFilosofos();

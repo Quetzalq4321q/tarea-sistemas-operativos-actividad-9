@@ -7,6 +7,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de:
  *   so-main/filosofos_comensales/filosofos00.cpp .. filosofos04.cpp
@@ -65,6 +75,10 @@ void ejecutarFilosofo(int id,
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     const std::vector<std::string> nombres = {
         "Sócrates", "Pitágoras", "Platón", "Aristóteles", "Hipatia"
     };

@@ -6,6 +6,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión moderna C++17 de:
  *   so-main/exclusion_mutua/exclusionMutua00.cpp .. 02.cpp
@@ -93,6 +103,10 @@ void ejecutarConAtomico(int numHilos, long long tope) {
 } // namespace
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     const long long tope = leerTope();
     ejecutarConMutex(NUM_HILOS, tope);
     ejecutarConAtomico(NUM_HILOS, tope);

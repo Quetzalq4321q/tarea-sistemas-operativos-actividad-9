@@ -7,6 +7,16 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 /**
  * Versión mejorada de: so-main/pthread/pthread-example.cpp
  *
@@ -54,6 +64,10 @@ void ejecutarTrabajo(int idHilo) {
 } // namespace
 
 int main(int argc, char* argv[]) {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     int numHilos = NUM_THREADS_DEFAULT;
     if (argc > 1) {
         try {

@@ -9,6 +9,16 @@
 #include <utility> // Para std::swap
 #include <vector> // Librería para trabajar con vectores
 
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 // Función para limitar el número máximo de fideos
 int LimitFideMax(int fide) {
     const int maxFi = 2147483647;
@@ -137,6 +147,10 @@ public:
 std::vector<std::mutex> Filo::tenedores(5);
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+#endif
     int fide;
     int numFilos;
 
