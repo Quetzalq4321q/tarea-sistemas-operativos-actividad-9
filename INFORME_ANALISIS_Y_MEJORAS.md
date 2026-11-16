@@ -152,6 +152,19 @@ La serie muestra fallos progresivos en el diseño del patrón Monitor:
 4. **Comparativa de `pthread-example.cpp` original frente a la consola limpia de `pthread_example_upgraded`:**
    ![Comparativa pthread original vs upgraded](capturas/04_pthread_original_y_upgraded_clion.jpg)
 
+5. **Exclusión mutua antes y después:** Con `tope = 100000`, `exclusionMutua01` produjo `145585` en la ejecución capturada, frente a los `500000` esperados. La ejecución mejorada alcanzó `500000` con `std::mutex` y con `std::atomic`.
+   ![Exclusión mutua original: se pierden incrementos](capturas/05_exclusion_mutua_original_clion.png)
+   ![Exclusión mutua mejorada: ambos métodos alcanzan el total esperado](capturas/06_exclusion_mutua_upgraded_clion.png)
+
+6. **Filósofos comensales en ejecución:** `completo_2_upgraded`, con 100 fideos y 7 filósofos, finalizó con 100 fideos consumidos, 0 restantes y estadísticas de tiempos.
+   ![Filósofos comensales mejorados y estadísticas finales](capturas/07_filosofos_comensales_upgraded_clion.png)
+
+7. **Monitor mejorado:** El observador recibió la señal al alcanzar `cont = 100`; el valor final coincide con el esperado.
+   ![Monitor mejorado con meta alcanzada](capturas/08_monitor_upgraded_clion.png)
+
+8. **Productor-consumidor mejorado:** La consola muestra consumo concurrente y cierre ordenado con 16 elementos producidos y 16 consumidos.
+   ![Productor-consumidor mejorado con totales iguales](capturas/09_productor_consumidor_upgraded_clion.png)
+
 ---
 
 ## 5. Conclusiones Reflexivas del Equipo

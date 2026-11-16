@@ -58,6 +58,28 @@ Se muestra el código original en C (`<unistd.h>`, `rand()`, `printf`) frente a 
 
 ![Código original pthread-example.cpp y ejecución de pthread_example_upgraded](capturas/04_pthread_original_y_upgraded_clion.jpg)
 
+### 5. Exclusión mutua original y corregida
+Con `tope = 100000`, `exclusionMutua01` terminó en `145585` en esta ejecución, por debajo de los `500000` incrementos esperados. En `exclusion_mutua_cpp_upgraded`, tanto `std::mutex` como `std::atomic` alcanzaron `500000`.
+
+![Exclusión mutua original: resultado 145585 de 500000](capturas/05_exclusion_mutua_original_clion.png)
+
+![Exclusión mutua mejorada: mutex y atomic alcanzan 500000](capturas/06_exclusion_mutua_upgraded_clion.png)
+
+### 6. Filósofos comensales mejorados
+`completo_2_upgraded` terminó la simulación con 7 filósofos y 100 fideos: consumió los 100, dejó 0 y presentó los tiempos de pensamiento y comida con caracteres legibles.
+
+![Filósofos mejorados: estadísticas de 100 fideos consumidos](capturas/07_filosofos_comensales_upgraded_clion.png)
+
+### 7. Monitor mejorado
+`monitor_upgraded` mostró `[Observador] Meta alcanzada: cont = 100` y confirmó el valor final esperado.
+
+![Monitor mejorado: observador alcanza cont igual a 100](capturas/08_monitor_upgraded_clion.png)
+
+### 8. Productor-consumidor mejorado
+`productor_consumidor_upgraded` mostró la actividad de productores y consumidores y terminó con `Total producido : 16` y `Total consumido : 16`.
+
+![Productor-consumidor mejorado: totales iguales y cierre limpio](capturas/09_productor_consumidor_upgraded_clion.png)
+
 ---
 
 ## Estructura del Repositorio
