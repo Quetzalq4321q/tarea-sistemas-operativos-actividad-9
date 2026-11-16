@@ -1,15 +1,77 @@
-# Directorios de compilación e IDE
-cmake-build-debug/
-cmake-build-*/
-UPGRADES/build/
-build/
-.idea/
+# ==========================================
+# .gitignore para proyectos C / C++ y CMake
+# ==========================================
 
-# Binarios y objetos compilados
+# --- Directorios de compilación CMake / Ninja ---
+cmake-build-*/
+build/
+**/build/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+install_manifest.txt
+CTestTestfile.cmake
+Testing/
+.ninja_deps
+.ninja_log
+build.ninja
+rules.ninja
+Makefile
+
+# --- IDEs y editores (CLion, VS Code, Visual Studio) ---
+.idea/
+*.iml
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# --- Binarios, ejecutables, objetos y librerías ---
 *.exe
 *.out
+*.app
 *.o
 *.obj
+*.lo
+*.ko
+*.elf
 *.a
 *.lib
+*.la
+*.lai
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# --- Depuración, precompilados y temporales de compilador ---
 *.pdb
+*.ilk
+*.exp
+*.idb
+*.pch
+*.gch
+*.d
+*.stackdump
+*.stash
+core
+vgcore.*
+
+# --- Sistema operativo y archivos temporales ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+*.log
